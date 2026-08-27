@@ -25,6 +25,18 @@ app.get("/", (req, res) => {
     });
 });
 
+// Get all tasks
+app.get("/tasks", async (req, res) => {
+    try {
+        const tasks = await Task.find();
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        });
+    }
+});
+
 // Add a new task
 app.post("/tasks", async (req, res) => {
     try {
@@ -35,6 +47,67 @@ app.post("/tasks", async (req, res) => {
         res.status(201).json(task);
     } catch (error) {
         res.status(400).json({
+            error: error.message
+        });
+    }
+});
+
+// Update a task
+app.put("/tasks/:id", async (req, res) => {
+    try {
+        const task = await Task.findByIdAndUpdate(
+            req.params.id,
+            {
+                title: req.body.title,
+                completed: req.body.completed
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        res.json(task);
+    } catch (error) {
+        res.status(400).json({
+            error: error.message
+        });
+    }
+});
+
+// Delete a task
+app.delete("/tasks/:id", async (req, res) => {
+    try {
+        const task = await Task.findByIdAndDelete(req.params.id);
+
+        if (!task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        res.json({
+            message: "Task deleted successfully"
+        });
+    } catch (error) {
+        res.status(400).json({
+            error: error.message
+        });
+    }
+});
+
+// Server
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});        res.status(400).json({
             error: error.message
         });
     }
