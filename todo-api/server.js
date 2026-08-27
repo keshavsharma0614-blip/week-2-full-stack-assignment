@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+const Task = require("./models/Task");
+
 const app = express();
 
 app.use(express.json());
@@ -21,6 +23,21 @@ app.get("/", (req, res) => {
     res.json({
         message: "To-Do REST API is running"
     });
+});
+
+// Add a new task
+app.post("/tasks", async (req, res) => {
+    try {
+        const task = await Task.create({
+            title: req.body.title
+        });
+
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(400).json({
+            error: error.message
+        });
+    }
 });
 
 // Server
